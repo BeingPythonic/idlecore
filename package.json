@@ -3,6 +3,20 @@
   "version": "1.0.0",
   "description": "Modular engine for incremental and idle games.",
   "license": "ISC",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
   "packageManager": "pnpm@10.33.0",
   "scripts": {
     "build": "tsup",

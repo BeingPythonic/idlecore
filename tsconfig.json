@@ -8,6 +8,7 @@
     "strict": true,
     "declaration": true,
     "declarationMap": true,
+    "ignoreDeprecations": "6.0",
     "sourceMap": true,
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,

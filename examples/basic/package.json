@@ -1,0 +1,11 @@
+{
+  "name": "idlecore-basic-example",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "demo": "node src/main.mjs"
+  },
+  "dependencies": {
+    "idlecore": "workspace:*"
+  }
+}

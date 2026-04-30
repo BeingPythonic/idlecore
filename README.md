@@ -28,12 +28,18 @@ pnpm add idlecore
 ```ts
 import {
   Engine,
+  EngineScheduler,
+  canPurchaseGenerator,
+  canPurchaseUpgrade,
   createGeneratorSystem,
   createProgressionSystem,
+  getGeneratorCost,
   purchaseGenerator,
   purchaseUpgrade,
+  resourceSystem,
   resourceAtLeast,
   setGeneratorMultiplier,
+  unlockIsActive,
   type GameplayState,
 } from "idlecore";
 
@@ -57,7 +63,7 @@ const drillUpgrade = {
 
 const engine = new Engine<GameplayState>({
   resources: {
-    gold: { amount: 20, rate: 0 },
+    gold: { amount: 20, rate: 3 },
     ore: { amount: 0, rate: 0 },
   },
   generators: {},
@@ -66,6 +72,7 @@ const engine = new Engine<GameplayState>({
   achievements: {},
 });
 
+engine.registerSystem(resourceSystem);
 engine.registerSystem(createGeneratorSystem([miner]));
 engine.registerSystem(
   createProgressionSystem({
@@ -77,9 +84,21 @@ engine.registerSystem(
 );
 
 engine.tick(1);
-purchaseGenerator(engine.state, miner);
-purchaseUpgrade(engine.state, drillUpgrade);
-engine.simulate(5, 1);
+
+if (canPurchaseGenerator(engine.state, miner)) {
+  purchaseGenerator(engine.state, miner);
+}
+
+if (canPurchaseUpgrade(engine.state, drillUpgrade)) {
+  purchaseUpgrade(engine.state, drillUpgrade);
+}
+
+const scheduler = new EngineScheduler(engine, { step: 1 });
+console.log(getGeneratorCost(engine.state, miner));
+
+scheduler.tickOnce();
+engine.simulate(4, 1);
+console.log(unlockIsActive("oreProduction")(engine.state));
 ```
 
 ## Integration Example
@@ -130,11 +149,18 @@ Systems must be deterministic and mutate only the provided state.
 - Purchase helpers for generators and upgrades
 - Unlock and achievement evaluation via reusable conditions
 - Progression systems that keep catalog state synchronized with game state
+- State synchronization helpers for generator and upgrade catalogs
 
 ### Runtime
 
 - `EngineScheduler` for real-time fixed-step execution on top of the deterministic core
 - Pluggable clock adapter for browser, Node, or test environments
+
+## Guides
+
+- `docs/getting-started.md`: project setup and first framework flow
+- `docs/gameplay.md`: gameplay state, purchases, progression, and scheduler usage
+- `docs/release.md`: release and publish hygiene
 
 ### `resourceSystem`
 

@@ -38,6 +38,8 @@ export function addResourceAmount<TState extends ResourceState>(
   resourceId: string,
   amount: number,
 ): void {
+  // Resource helpers are shared by purchases, production, and rewards, so
+  // they centralize rounding and missing-resource checks in one place.
   const resource = state.resources[resourceId];
   assertResource(resource, resourceId);
   resource.amount = roundAmount(resource.amount + amount);

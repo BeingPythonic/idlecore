@@ -71,6 +71,8 @@ export class EngineScheduler<TState> {
 
     let ticks = 0;
 
+    // Consume accumulated real time in deterministic fixed-size simulation
+    // steps so runtime jitter does not change game outcomes.
     while (this.accumulated + EPSILON >= this.step) {
       this.engine.tick(this.step);
       this.accumulated -= this.step;

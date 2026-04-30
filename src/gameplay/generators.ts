@@ -26,6 +26,8 @@ export function createGeneratorSystem<TState extends GameplayState>(
       }
 
       for (const production of definition.produces) {
+        // Production rules stay data-driven: a generator can emit fixed values
+        // or compute output from the wider game state.
         const amountPerSecond =
           typeof production.amountPerSecond === "number"
             ? production.amountPerSecond
@@ -89,6 +91,8 @@ export function syncGeneratorState<TState extends GameplayState>(
   state: TState,
   definition: GeneratorDefinition<TState>,
 ): GeneratorStateEntry {
+  // Definitions describe the catalog; state tracks the mutable owned/unlocked
+  // data for a specific playthrough.
   const existing = state.generators[definition.id];
 
   if (existing) {

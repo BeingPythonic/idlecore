@@ -14,6 +14,9 @@ export function createProgressionSystem<TState extends GameplayState>(
   definitions: ProgressionDefinitions<TState>,
 ): System<TState> {
   return (state) => {
+    // Progression runs as a reconciliation step: it synchronizes definition
+    // catalogs into mutable state and then evaluates unlock/achievement rules
+    // against the latest simulation snapshot.
     for (const definition of definitions.generators ?? []) {
       syncGeneratorState(state, definition);
     }

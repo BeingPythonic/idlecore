@@ -4,15 +4,26 @@ import {
   Engine,
   EngineScheduler,
   addResourceAmount,
+  achievementIsEarned,
+  canAffordCosts,
   canPurchaseGenerator,
+  canPurchaseUpgrade,
   createGeneratorSystem,
   createProgressionSystem,
+  getGeneratorCost,
+  getResourceAmount,
   generatorOwnedAtLeast,
+  payCosts,
   purchaseGenerator,
   purchaseUpgrade,
+  resourceSystem,
   resourceAtLeast,
+  scaleCosts,
   setGeneratorMultiplier,
   syncGeneratorState,
+  syncUpgradeState,
+  unlockIsActive,
+  upgradeLevelAtLeast,
   type AchievementDefinition,
   type GameplayState,
   type GeneratorDefinition,
@@ -60,6 +71,9 @@ describe("gameplay framework", () => {
     engine.simulate(5, 1);
     expect(state.resources.ore.amount).toBe(15);
     expect(state.achievements.firstDrill?.earned).toBe(true);
+    expect(unlockIsActive("oreProduction")(state)).toBe(true);
+    expect(achievementIsEarned("firstDrill")(state)).toBe(true);
+    expect(upgradeLevelAtLeast("steelDrill", 1)(state)).toBe(true);
   });
 
   it("applies generator cost scaling deterministically", () => {
@@ -76,6 +90,9 @@ describe("gameplay framework", () => {
     expect(purchaseGenerator(state, miner)).toBe(true);
     expect(state.resources.gold.amount).toBe(3.25);
     expect(state.generators.miner.owned).toBe(2);
+    expect(getGeneratorCost(state, miner)).toEqual([
+      { resourceId: "gold", amount: 15.3125 },
+    ]);
   });
 
   it("supports runtime scheduling through a clock adapter", () => {
@@ -111,6 +128,7 @@ describe("gameplay framework", () => {
 
     scheduler.stop();
     expect(scheduler.isRunning()).toBe(false);
+    expect(scheduler.getPendingTime()).toBe(0);
   });
 
   it("lets upgrades modify generator multipliers cleanly", () => {
@@ -122,12 +140,43 @@ describe("gameplay framework", () => {
 
     expect(state.generators.miner.multiplier).toBe(3);
   });
+
+  it("covers helper functions used by consumers", () => {
+    const state = createTestState();
+    const miner = createMinerDefinition();
+    const drillUpgrade = createDrillUpgrade();
+
+    syncGeneratorState(state, miner);
+    syncUpgradeState(state, drillUpgrade);
+
+    expect(getResourceAmount(state, "gold")).toBe(10);
+    expect(canAffordCosts(state, [{ resourceId: "gold", amount: 4 }])).toBe(
+      true,
+    );
+    expect(canPurchaseUpgrade(state, drillUpgrade)).toBe(false);
+
+    payCosts(state, [{ resourceId: "gold", amount: 2 }]);
+    expect(getResourceAmount(state, "gold")).toBe(8);
+    expect(scaleCosts([{ resourceId: "gold", amount: 2 }], 1.5)).toEqual([
+      { resourceId: "gold", amount: 3 },
+    ]);
+  });
+
+  it("allows passive resource generation alongside gameplay systems", () => {
+    const state = createTestState();
+    const engine = new Engine(state);
+
+    engine.registerSystem(resourceSystem);
+    engine.simulate(2, 1);
+
+    expect(state.resources.gold.amount).toBe(12);
+  });
 });
 
 function createTestState(): GameplayState {
   return {
     resources: {
-      gold: { amount: 10, rate: 0 },
+      gold: { amount: 10, rate: 1 },
       ore: { amount: 0, rate: 0 },
     },
     generators: {},
@@ -159,6 +208,7 @@ function createDrillUpgrade(): UpgradeDefinition<GameplayState> {
     name: "Steel Drill",
     costs: [{ resourceId: "gold", amount: 10 }],
     isUnlocked: generatorOwnedAtLeast("miner", 1),
+    canPurchase: resourceAtLeast("gold", 10),
     onPurchase: [
       (state) => {
         setGeneratorMultiplier(state, "miner", 2);

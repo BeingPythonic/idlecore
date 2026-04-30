@@ -1,10 +1,25 @@
 import {
   Engine,
+  EngineScheduler,
+  addResourceAmount,
+  canAffordCosts,
+  canPurchaseGenerator,
+  canPurchaseUpgrade,
   createGeneratorSystem,
   createProgressionSystem,
+  getGeneratorCost,
+  getResourceAmount,
   purchaseGenerator,
   purchaseUpgrade,
+  resourceSystem,
   resourceAtLeast,
+  scaleCosts,
+  syncGeneratorState,
+  syncUpgradeState,
+  unlockIsActive,
+  upgradeLevelAtLeast,
+  achievementIsEarned,
+  payCosts,
   setGeneratorMultiplier,
 } from "idlecore";
 
@@ -12,7 +27,7 @@ const engine = new Engine({
   resources: {
     gold: {
       amount: 20,
-      rate: 0,
+      rate: 3,
     },
     ore: {
       amount: 0,
@@ -24,6 +39,8 @@ const engine = new Engine({
   unlocks: {},
   achievements: {},
 });
+
+const schedulerClock = createManualClock();
 
 const miner = {
   id: "miner",
@@ -49,6 +66,7 @@ const drillUpgrade = {
   ],
 };
 
+engine.registerSystem(resourceSystem);
 engine.registerSystem(createGeneratorSystem([miner]));
 engine.registerSystem(
   createProgressionSystem({
@@ -69,16 +87,81 @@ engine.registerSystem(
   }),
 );
 
+syncGeneratorState(engine.state, miner);
+syncUpgradeState(engine.state, drillUpgrade);
+
 engine.tick(1);
-purchaseGenerator(engine.state, miner);
-purchaseUpgrade(engine.state, drillUpgrade);
-engine.simulate(5, 1);
+
+const previewCost = getGeneratorCost(engine.state, miner);
+const canAffordMiner = canAffordCosts(engine.state, previewCost);
+
+if (canAffordMiner && canPurchaseGenerator(engine.state, miner)) {
+  purchaseGenerator(engine.state, miner);
+}
+
+if (canAffordCosts(engine.state, [{ resourceId: "gold", amount: 2 }])) {
+  payCosts(engine.state, [{ resourceId: "gold", amount: 2 }]);
+}
+
+engine.simulate(2, 1);
+addResourceAmount(engine.state, "gold", 4);
+
+if (canPurchaseUpgrade(engine.state, drillUpgrade)) {
+  purchaseUpgrade(engine.state, drillUpgrade);
+}
+
+const scheduler = new EngineScheduler(engine, {
+  step: 1,
+  intervalMs: 1000,
+  clock: schedulerClock,
+});
+
+scheduler.start();
+schedulerClock.advance(5000);
+schedulerClock.flush();
+scheduler.stop();
 
 console.log("Idlecore integration example");
-console.log(`gold: ${engine.state.resources.gold.amount}`);
+console.log(`gold: ${getResourceAmount(engine.state, "gold")}`);
 console.log(`ore: ${engine.state.resources.ore.amount}`);
 console.log(`miners: ${engine.state.generators.miner.owned}`);
-console.log(`ore unlocked: ${engine.state.unlocks.oreProduction.unlocked}`);
+console.log(`next miner cost: ${previewCost[0].amount}`);
+console.log(`scaled baseline: ${scaleCosts(miner.baseCosts, 1.5)[0].amount}`);
 console.log(
-  `achievement earned: ${engine.state.achievements.orePioneer.earned}`,
+  `scaled preview: ${getGeneratorCost(engine.state, miner)[0].amount}`,
 );
+console.log(`can purchase miner: ${canPurchaseGenerator(engine.state, miner)}`);
+console.log(
+  `upgrade unlocked: ${upgradeLevelAtLeast("steelDrill", 1)(engine.state)}`,
+);
+console.log(`ore unlocked: ${unlockIsActive("oreProduction")(engine.state)}`);
+console.log(
+  `achievement earned: ${achievementIsEarned("orePioneer")(engine.state)}`,
+);
+
+function createManualClock() {
+  let now = 0;
+  let callback = null;
+
+  return {
+    now: () => now,
+    setInterval: (nextCallback) => {
+      callback = nextCallback;
+      return 1;
+    },
+    clearInterval: () => {
+      callback = null;
+    },
+    advance: (ms) => {
+      now += ms;
+    },
+    flush: () => {
+      if (!callback) {
+        return 0;
+      }
+
+      callback();
+      return 1;
+    },
+  };
+}

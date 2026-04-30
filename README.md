@@ -42,9 +42,9 @@ engine.simulate(10);
 console.log(engine.state.resources.gold.amount); // 10
 ```
 
-## Example Project
+## Integration Example
 
-A simple consumer project lives in `examples/basic`.
+A small consumer project lives in `examples/basic`.
 
 ```bash
 pnpm install
@@ -52,7 +52,7 @@ pnpm build
 pnpm example:basic
 ```
 
-That example imports `idlecore` through a local package link and runs a small deterministic resource simulation.
+That project imports `idlecore` through a local package link and runs a deterministic resource simulation.
 
 ## Verification
 
@@ -60,7 +60,7 @@ That example imports `idlecore` through a local package link and runs a small de
 pnpm verify
 ```
 
-This runs formatting checks, linting, tests, the package build, and the example consumer project.
+This runs formatting checks, linting, tests, the package build, and the integration consumer project.
 
 ## API
 

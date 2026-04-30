@@ -1,6 +1,6 @@
-# Basic Example
+# Integration Example
 
-This project demonstrates consuming `idlecore` as a dependency from another package in the same repository.
+This project verifies that `idlecore` can be consumed as a dependency from another package in the same repository.
 
 ## Run
 

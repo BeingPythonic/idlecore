@@ -16,6 +16,6 @@ const engine = new Engine({
 engine.registerSystem(resourceSystem);
 engine.simulate(10, 2);
 
-console.log("Idlecore basic example");
+console.log("Idlecore integration example");
 console.log(`gold: ${engine.state.resources.gold.amount}`);
 console.log(`stone: ${engine.state.resources.stone.amount}`);

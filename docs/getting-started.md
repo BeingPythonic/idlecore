@@ -12,7 +12,7 @@ pnpm build
 pnpm test:run
 ```
 
-## Run the Basic Example
+## Run the Integration Example
 
 ```bash
 pnpm install
@@ -20,4 +20,4 @@ pnpm build
 pnpm example:basic
 ```
 
-The example project imports `idlecore` through a local package link and simulates a small resource economy.
+The integration project imports `idlecore` through a local package link and simulates a small resource economy.

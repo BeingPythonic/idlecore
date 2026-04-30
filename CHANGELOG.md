@@ -2,4 +2,7 @@
 
 ## Unreleased
 
-- Added deterministic engine core, resource system, tests, docs, workspace example, and repo verification tooling.
+- Established the initial public package baseline.
+- Added deterministic engine core and resource generation system.
+- Added verification tooling, CI, and consumer integration coverage.
+- Added maintainer-facing documentation and release guidance.

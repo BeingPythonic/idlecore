@@ -38,7 +38,7 @@ importers:
   examples/basic:
     dependencies:
       idlecore:
-        specifier: workspace:*
+        specifier: link:../..
         version: link:../..
 
 packages:

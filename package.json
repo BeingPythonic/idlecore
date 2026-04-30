@@ -37,7 +37,8 @@
     "format:check": "prettier --check .",
     "lint": "eslint .",
     "test": "vitest",
-    "test:run": "vitest run"
+    "test:run": "vitest run",
+    "verify": "pnpm format:check && pnpm lint && pnpm test:run && pnpm build && pnpm example:basic"
   },
   "devDependencies": {
     "@types/node": "^25.6.0",

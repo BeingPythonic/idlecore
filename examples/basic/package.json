@@ -6,6 +6,6 @@
     "demo": "node src/main.mjs"
   },
   "dependencies": {
-    "idlecore": "workspace:*"
+    "idlecore": "link:../.."
   }
 }

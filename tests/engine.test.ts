@@ -131,11 +131,11 @@ describe("Engine input validation", () => {
 });
 
 describe("Engine API safety", () => {
-  it.fails("should reject non-object state inputs", () => {
+  it("rejects non-object state inputs", () => {
     expect(() => new Engine<number>(1)).toThrow(/state/i);
   });
 
-  it.fails("should prevent registering systems after ticking begins", () => {
+  it("prevents registering systems after ticking begins", () => {
     const engine = createResourceEngine(1);
 
     engine.tick(1);
@@ -143,13 +143,13 @@ describe("Engine API safety", () => {
     expect(() => engine.registerSystem(resourceSystem)).toThrow(/started/i);
   });
 
-  it.fails("should reject duplicate system registration", () => {
+  it("rejects duplicate system registration", () => {
     const engine = createResourceEngine(1);
 
     expect(() => engine.registerSystem(resourceSystem)).toThrow(/duplicate/i);
   });
 
-  it.fails("should protect engine state from external replacement", () => {
+  it("protects engine state from external replacement", () => {
     const engine = createResourceEngine(1);
 
     expect(() => {

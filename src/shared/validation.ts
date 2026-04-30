@@ -3,3 +3,11 @@ export function assertPositiveNumber(value: number, name: string): void {
     throw new Error(`${name} must be a positive finite number`);
   }
 }
+
+export function assertObjectState<TState>(
+  value: TState,
+): asserts value is TState & object {
+  if (typeof value !== "object" || value === null) {
+    throw new Error("state must be a non-null object");
+  }
+}

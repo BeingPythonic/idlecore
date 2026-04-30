@@ -52,7 +52,15 @@ pnpm build
 pnpm example:basic
 ```
 
-That example imports `idlecore` as a dependency and runs a small deterministic resource simulation.
+That example imports `idlecore` through a local package link and runs a small deterministic resource simulation.
+
+## Verification
+
+```bash
+pnpm verify
+```
+
+This runs formatting checks, linting, tests, the package build, and the example consumer project.
 
 ## API
 
@@ -62,6 +70,10 @@ That example imports `idlecore` as a dependency and runs a small deterministic r
 - Registers systems with `registerSystem(system)`.
 - Advances time with `tick(dt)`.
 - Simulates a time span with `simulate(totalTime, step?)`.
+- Rejects non-object initial state.
+- Rejects duplicate system registration.
+- Locks system registration once ticking or simulation starts.
+- Exposes mutable state contents but prevents replacing `engine.state` itself.
 
 ### `System<TState>`
 
@@ -91,7 +103,8 @@ interface ResourceState {
 - `simulate(totalTime)` is intended to match repeated shorter simulations that sum to the same total time.
 - Tests prefer exact values with integer-friendly rates and step sizes to avoid floating-point drift in expectations.
 
-## Current Gaps
+## Maintenance
 
-- API safety rules are still being tightened around invalid inputs and engine lifecycle behavior.
-- Edge-case tests are being added ahead of the corresponding implementation hardening.
+- `docs/getting-started.md` covers local development commands.
+- `docs/release.md` covers release and publish hygiene.
+- `CHANGELOG.md` tracks released and unreleased package changes.

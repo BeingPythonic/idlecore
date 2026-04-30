@@ -20,4 +20,4 @@ pnpm build
 pnpm example:basic
 ```
 
-The example project imports `idlecore` as a package dependency and simulates a small resource economy.
+The example project imports `idlecore` through a local package link and simulates a small resource economy.

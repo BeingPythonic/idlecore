@@ -1,12 +1,23 @@
 {
   "name": "idlecore",
   "version": "1.0.0",
-  "description": "Modular engine for incremental and idle games.",
+  "description": "Deterministic TypeScript engine for incremental and idle games.",
+  "keywords": [
+    "idle",
+    "incremental",
+    "game-engine",
+    "simulation",
+    "typescript"
+  ],
   "license": "ISC",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "sideEffects": false,
+  "engines": {
+    "node": ">=18"
+  },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -15,18 +26,28 @@
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "README.md"
   ],
   "packageManager": "pnpm@10.33.0",
   "scripts": {
     "build": "tsup",
+    "example:basic": "pnpm --dir examples/basic demo",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "eslint .",
     "test": "vitest",
     "test:run": "vitest run"
   },
   "devDependencies": {
     "@types/node": "^25.6.0",
+    "@eslint/js": "^9.39.1",
+    "eslint": "^10.2.1",
+    "globals": "^16.4.0",
+    "prettier": "^3.8.3",
     "tsup": "^8.5.1",
     "typescript": "^6.0.3",
+    "typescript-eslint": "^8.46.2",
     "vitest": "^4.1.5"
   }
 }

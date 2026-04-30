@@ -1,4 +1,5 @@
 import type { System } from "./types";
+import { assertPositiveNumber } from "../shared/validation";
 
 const EPSILON = 1e-12;
 
@@ -43,11 +44,5 @@ export class Engine<TState> {
     }
 
     return this.state;
-  }
-}
-
-function assertPositiveNumber(value: number, name: string): void {
-  if (!Number.isFinite(value) || value <= 0) {
-    throw new Error(`${name} must be a positive finite number`);
   }
 }

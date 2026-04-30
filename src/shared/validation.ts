@@ -4,6 +4,12 @@ export function assertPositiveNumber(value: number, name: string): void {
   }
 }
 
+export function assertNonNegativeNumber(value: number, name: string): void {
+  if (!Number.isFinite(value) || value < 0) {
+    throw new Error(`${name} must be a non-negative finite number`);
+  }
+}
+
 export function assertObjectState<TState>(
   value: TState,
 ): asserts value is TState & object {

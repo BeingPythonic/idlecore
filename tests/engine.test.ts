@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import { Engine, resourceSystem, type ResourceState, type System } from "../src";
+import {
+  Engine,
+  resourceSystem,
+  type ResourceState,
+  type System,
+} from "../src";
 
 describe("Engine", () => {
   it("runs registered systems during a tick", () => {
@@ -62,6 +67,101 @@ describe("Engine", () => {
     expect(splitEngine.state.resources.gold.amount).toBe(
       fullEngine.state.resources.gold.amount,
     );
+  });
+
+  it("supports a simulation step larger than the total time", () => {
+    const engine = createResourceEngine(2);
+
+    engine.simulate(3, 10);
+
+    expect(engine.state.resources.gold.amount).toBe(6);
+  });
+
+  it("runs with no registered systems", () => {
+    const state = { value: 1 };
+    const engine = new Engine(state);
+
+    engine.tick(5);
+    engine.simulate(3);
+
+    expect(engine.state.value).toBe(1);
+  });
+
+  it("updates multiple resources in one pass", () => {
+    const engine = new Engine<ResourceState>({
+      resources: {
+        gold: { amount: 0, rate: 2 },
+        wood: { amount: 10, rate: 3 },
+      },
+    });
+
+    engine.registerSystem(resourceSystem);
+    engine.simulate(4);
+
+    expect(engine.state.resources.gold.amount).toBe(8);
+    expect(engine.state.resources.wood.amount).toBe(22);
+  });
+
+  it("handles exact fractional steps consistently when they divide evenly", () => {
+    const steppedEngine = createResourceEngine(8);
+    const singleRunEngine = createResourceEngine(8);
+
+    steppedEngine.simulate(2, 0.5);
+    singleRunEngine.simulate(2);
+
+    expect(steppedEngine.state.resources.gold.amount).toBe(
+      singleRunEngine.state.resources.gold.amount,
+    );
+  });
+});
+
+describe("Engine input validation", () => {
+  it.each([
+    ["tick", () => new Engine({}).tick(0)],
+    ["tick", () => new Engine({}).tick(-1)],
+    ["tick", () => new Engine({}).tick(Number.NaN)],
+    ["simulate", () => new Engine({}).simulate(0)],
+    ["simulate", () => new Engine({}).simulate(-1)],
+    ["simulate", () => new Engine({}).simulate(Number.POSITIVE_INFINITY)],
+    ["simulate step", () => new Engine({}).simulate(1, 0)],
+    ["simulate step", () => new Engine({}).simulate(1, -1)],
+  ])("rejects invalid %s inputs", (_, run) => {
+    expect(run).toThrow(/positive finite number/);
+  });
+});
+
+describe("Engine API safety", () => {
+  it.fails("should reject non-object state inputs", () => {
+    expect(() => new Engine<number>(1)).toThrow(/state/i);
+  });
+
+  it.fails("should prevent registering systems after ticking begins", () => {
+    const engine = createResourceEngine(1);
+
+    engine.tick(1);
+
+    expect(() => engine.registerSystem(resourceSystem)).toThrow(/started/i);
+  });
+
+  it.fails("should reject duplicate system registration", () => {
+    const engine = createResourceEngine(1);
+
+    expect(() => engine.registerSystem(resourceSystem)).toThrow(/duplicate/i);
+  });
+
+  it.fails("should protect engine state from external replacement", () => {
+    const engine = createResourceEngine(1);
+
+    expect(() => {
+      (engine as { state: ResourceState }).state = {
+        resources: {
+          gold: {
+            amount: 99,
+            rate: 99,
+          },
+        },
+      };
+    }).toThrow();
   });
 });
 

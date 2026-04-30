@@ -6,6 +6,12 @@
 pnpm build
 ```
 
+## Verify the Repository
+
+```bash
+pnpm verify
+```
+
 ## Run Tests
 
 ```bash
@@ -20,4 +26,4 @@ pnpm build
 pnpm example:basic
 ```
 
-The integration project imports `idlecore` through a local package link and simulates a small resource economy.
+The integration project imports `idlecore` through a local package link and simulates a resource economy with generators, upgrades, unlocks, and achievements.

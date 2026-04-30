@@ -1,12 +1,14 @@
 # idlecore
 
-`idlecore` is a deterministic TypeScript engine for incremental and idle games.
+`idlecore` is a deterministic TypeScript framework for incremental and idle games.
 
 ## Structure
 
 ```text
 src/
   core/
+  gameplay/
+  runtime/
   shared/
   systems/
 docs/
@@ -24,22 +26,60 @@ pnpm add idlecore
 ## Usage
 
 ```ts
-import { Engine, resourceSystem, type ResourceState } from "idlecore";
+import {
+  Engine,
+  createGeneratorSystem,
+  createProgressionSystem,
+  purchaseGenerator,
+  purchaseUpgrade,
+  resourceAtLeast,
+  setGeneratorMultiplier,
+  type GameplayState,
+} from "idlecore";
 
-const engine = new Engine<ResourceState>({
-  resources: {
-    gold: {
-      amount: 0,
-      rate: 1,
+const miner = {
+  id: "miner",
+  baseCosts: [{ resourceId: "gold", amount: 5 }],
+  produces: [{ resourceId: "ore", amountPerSecond: 1 }],
+  isUnlocked: resourceAtLeast("gold", 5),
+};
+
+const drillUpgrade = {
+  id: "steelDrill",
+  costs: [{ resourceId: "gold", amount: 10 }],
+  isUnlocked: (state: GameplayState) => state.generators.miner?.owned >= 1,
+  onPurchase: [
+    (state: GameplayState) => {
+      setGeneratorMultiplier(state, "miner", 2);
     },
+  ],
+};
+
+const engine = new Engine<GameplayState>({
+  resources: {
+    gold: { amount: 20, rate: 0 },
+    ore: { amount: 0, rate: 0 },
   },
+  generators: {},
+  upgrades: {},
+  unlocks: {},
+  achievements: {},
 });
 
-engine.registerSystem(resourceSystem);
+engine.registerSystem(createGeneratorSystem([miner]));
+engine.registerSystem(
+  createProgressionSystem({
+    generators: [miner],
+    upgrades: [drillUpgrade],
+    unlocks: [{ id: "oreProduction", condition: resourceAtLeast("ore", 5) }],
+    achievements: [{ id: "orePioneer", condition: resourceAtLeast("ore", 10) }],
+  }),
+);
 
-engine.simulate(10);
-
-console.log(engine.state.resources.gold.amount); // 10
+engine.tick(1);
+purchaseGenerator(engine.state, miner);
+purchaseUpgrade(engine.state, drillUpgrade);
+engine.simulate(5, 1);
 ```
 
 ## Integration Example
@@ -52,7 +92,7 @@ pnpm build
 pnpm example:basic
 ```
 
-That project imports `idlecore` through a local package link and runs a deterministic resource simulation.
+That project imports `idlecore` through a local package link and runs a deterministic resource economy with generators, upgrades, unlocks, and achievements.
 
 ## Verification
 
@@ -82,6 +122,19 @@ type System<TState> = (state: TState, dt: number) => void;
 ```
 
 Systems must be deterministic and mutate only the provided state.
+
+### Gameplay
+
+- Generic resource costs and payment helpers
+- Generator and building definitions with scalable costs
+- Purchase helpers for generators and upgrades
+- Unlock and achievement evaluation via reusable conditions
+- Progression systems that keep catalog state synchronized with game state
+
+### Runtime
+
+- `EngineScheduler` for real-time fixed-step execution on top of the deterministic core
+- Pluggable clock adapter for browser, Node, or test environments
 
 ### `resourceSystem`
 

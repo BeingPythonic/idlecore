@@ -113,6 +113,18 @@ pnpm example:basic
 
 That project imports `idlecore` through a local package link and runs a deterministic resource economy with generators, upgrades, unlocks, and achievements.
 
+## Browser Example
+
+An interactive browser example lives in `examples/browser`.
+
+```bash
+pnpm install
+pnpm build
+pnpm example:browser
+```
+
+That example runs the framework in a browser with passive income, generator purchases, upgrades, unlocks, achievements, offline simulation, and the runtime scheduler.
+
 ## Verification
 
 ```bash

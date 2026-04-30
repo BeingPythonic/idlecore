@@ -1,0 +1,16 @@
+{
+  "name": "idlecore-browser-example",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "idlecore": "link:../.."
+  },
+  "devDependencies": {
+    "vite": "^7.1.11"
+  }
+}

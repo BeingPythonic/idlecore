@@ -41,6 +41,16 @@ importers:
         specifier: link:../..
         version: link:../..
 
+  examples/browser:
+    dependencies:
+      idlecore:
+        specifier: link:../..
+        version: link:../..
+    devDependencies:
+      vite:
+        specifier: ^7.1.11
+        version: 7.3.2(@types/node@25.6.0)(lightningcss@1.32.0)
+
 packages:
   "@emnapi/core@1.10.0":
     resolution:
@@ -1920,6 +1930,49 @@ packages:
         integrity: sha512-7rKUyy33Q1yc98pQ1DAmLtwX109F7TIfWlW1Ydo8Wl1ii1SeHieeh0HHfPeL2fMXK6z0s8ecKs9frCuLJvndBg==,
       }
 
+  vite@7.3.2:
+    resolution:
+      {
+        integrity: sha512-Bby3NOsna2jsjfLVOHKes8sGwgl4TT0E6vvpYgnAYDIF/tie7MRaFthmKuHx1NSXjiTueXH3do80FMQgvEktRg==,
+      }
+    engines: { node: ^20.19.0 || >=22.12.0 }
+    hasBin: true
+    peerDependencies:
+      "@types/node": ^20.19.0 || >=22.12.0
+      jiti: ">=1.21.0"
+      less: ^4.0.0
+      lightningcss: ^1.21.0
+      sass: ^1.70.0
+      sass-embedded: ^1.70.0
+      stylus: ">=0.54.8"
+      sugarss: ^5.0.0
+      terser: ^5.16.0
+      tsx: ^4.8.1
+      yaml: ^2.4.2
+    peerDependenciesMeta:
+      "@types/node":
+        optional: true
+      jiti:
+        optional: true
+      less:
+        optional: true
+      lightningcss:
+        optional: true
+      sass:
+        optional: true
+      sass-embedded:
+        optional: true
+      stylus:
+        optional: true
+      sugarss:
+        optional: true
+      terser:
+        optional: true
+      tsx:
+        optional: true
+      yaml:
+        optional: true
+
   vite@8.0.10:
     resolution:
       {
@@ -3032,6 +3085,19 @@ snapshots:
   uri-js@4.4.1:
     dependencies:
       punycode: 2.3.1
+
+  vite@7.3.2(@types/node@25.6.0)(lightningcss@1.32.0):
+    dependencies:
+      esbuild: 0.27.7
+      fdir: 6.5.0(picomatch@4.0.4)
+      picomatch: 4.0.4
+      postcss: 8.5.12
+      rollup: 4.60.2
+      tinyglobby: 0.2.16
+    optionalDependencies:
+      "@types/node": 25.6.0
+      fsevents: 2.3.3
+      lightningcss: 1.32.0
 
   vite@8.0.10(@types/node@25.6.0)(esbuild@0.27.7):
     dependencies:

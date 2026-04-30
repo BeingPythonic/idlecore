@@ -33,12 +33,14 @@
   "scripts": {
     "build": "tsup",
     "example:basic": "pnpm --dir examples/basic demo",
+    "example:browser": "pnpm --dir examples/browser dev",
+    "example:browser:build": "pnpm --dir examples/browser build",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "eslint .",
     "test": "vitest",
     "test:run": "vitest run",
-    "verify": "pnpm format:check && pnpm lint && pnpm test:run && pnpm build && pnpm example:basic"
+    "verify": "pnpm format:check && pnpm lint && pnpm test:run && pnpm build && pnpm example:basic && pnpm example:browser:build"
   },
   "devDependencies": {
     "@types/node": "^25.6.0",

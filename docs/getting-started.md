@@ -58,6 +58,16 @@ pnpm example:basic
 
 The integration project imports `idlecore` through a local package link and simulates a resource economy with generators, upgrades, unlocks, and achievements.
 
+## Run the Browser Example
+
+```bash
+pnpm install
+pnpm build
+pnpm example:browser
+```
+
+The browser example starts a local Vite dev server with an interactive mining loop built on the same framework APIs.
+
 ## Learn the Gameplay Layer
 
 See `docs/gameplay.md` for the current gameplay API surface and design patterns.
